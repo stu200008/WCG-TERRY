@@ -1,31 +1,7 @@
 <scaffold>
     <refresh onRefresh="onRefresh" loading="$loading">
         <slivers>
-            <sliver-appbar expandedHeight="180" color="white" floating="true" pinned="true">
-                <FlexibleSpaceBar padding="ltrb(20,0,0,64)">
-                    <attr:background>
-                        <stack>
-                            <img src="$picture" headers="$pictureHeaders" fit="cover" width="infinity()" height="infinity()"/>
-                            <filter filter="blur(4, 4)">
-                                <view color="hex(#0000)"/>
-                            </filter>
-                            <view width="infinity()" height="infinity()">
-                                <attr:gradient>
-                                    <LinearGradient begin="topCenter" end="bottomCenter">
-                                        <attr:colors>
-                                            <color>hex(#0007)</color>
-                                            <color>hex(#0000)</color>
-                                            <color>hex(#0007)</color>
-                                        </attr:colors>
-                                    </LinearGradient>
-                                </attr:gradient>
-                            </view>
-                        </stack>
-                    </attr:background>
-                    <text lines="3" overflow="ellipsis">
-                        <span size="14">$title</span>
-                    </text>
-                </FlexibleSpaceBar>
+            <sliver-appbar expandedHeight="56" color="color(canvas)" floating="true" pinned="true">
                 <attr:actions>
                     <button type="icon" onPressed="onSourcePressed">
                         <icon>open_in_browser</icon>
@@ -46,7 +22,7 @@
             <sliver-list-view itemCount="1">
                 <attr:builder>
                     <Function returnType="Widget">
-                        <view height="190">
+                        <view height="270">
                             <stack>
                                 <img src="$picture" headers="$pictureHeaders" fit="cover" width="infinity()" height="infinity()"/>
                                 <filter filter="blur(4, 4)">
@@ -64,29 +40,34 @@
                                     </attr:gradient>
                                 </view>
                                 <view width="infinity()" height="infinity()" padding="ltrb(16,12,16,12)">
-                                    <row>
-                                        <img src="$picture" headers="$pictureHeaders" width="120" height="160" fit="contain"/>
-                                        <view width="12"/>
-                                        <expanded>
-                                            <text lines="10" overflow="ellipsis">
-                                                <if candidate="isNotNull($tags)">
-                                                    <span size="10" color="hex(#FFFFFF)">標籤：</span>
-                                                    <for array="$tags">
-                                                        <span alignment="middle">
-                                                            <button type="text" tapTargetSize="shrinkWrap" minimumSize="zero" padding="ltrb(3,1,3,1)">
-                                                                <attr:onPressed>
-                                                                    <callback function="onTagPressed" args="array($item)"/>
-                                                                </attr:onPressed>
-                                                                <view color="hex(#0009)" padding="ltrb(4,2,4,2)">
-                                                                    <text size="10" color="hex(#FFFFFF)">${item}</text>
-                                                                </view>
-                                                            </button>
-                                                        </span>
-                                                    </for>
-                                                </if>
-                                            </text>
-                                        </expanded>
-                                    </row>
+                                    <column>
+                                        <text lines="2" overflow="ellipsis">
+                                            <span size="14" color="hex(#FFFFFF)">$title</span>
+                                        </text>
+                                        <row>
+                                            <img src="$picture" headers="$pictureHeaders" width="120" height="160" fit="contain"/>
+                                            <view width="12"/>
+                                            <expanded>
+                                                <text lines="10" overflow="ellipsis">
+                                                    <if candidate="isNotNull($tags)">
+                                                        <span size="10" color="hex(#FFFFFF)">標籤：</span>
+                                                        <for array="$tags">
+                                                            <span alignment="middle">
+                                                                <button type="text" tapTargetSize="shrinkWrap" minimumSize="zero" padding="ltrb(3,1,3,1)">
+                                                                    <attr:onPressed>
+                                                                        <callback function="onTagPressed" args="array($item)"/>
+                                                                    </attr:onPressed>
+                                                                    <view color="hex(#0009)" padding="ltrb(4,2,4,2)">
+                                                                        <text size="10" color="hex(#FFFFFF)">${item}</text>
+                                                                    </view>
+                                                                </button>
+                                                            </span>
+                                                        </for>
+                                                    </if>
+                                                </text>
+                                            </expanded>
+                                        </row>
+                                    </column>
                                 </view>
                             </stack>
                         </view>
