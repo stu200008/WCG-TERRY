@@ -99,9 +99,17 @@ module.exports = async function(url, includeDownload, includeAllPages) {
         }
     }
 
+    let chapter = {
+        title: '第 1 章',
+        subtitle: `${pages.length} 頁`,
+        link: url,
+        picture: pages[0].picture,
+        pictureHeaders: pages[0].pictureHeaders,
+        pages: pages
+    };
     let result = {
-        summary: `${pages.length} pages`,
-        list: pages.reverse(),
+        summary: `1 章 / ${pages.length} 頁`,
+        list: [chapter],
         downloadUrl: null,
         downloadError: null
     };

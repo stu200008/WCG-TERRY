@@ -7,26 +7,41 @@ class WnacgProcessor extends Processor {
     }
 
     async load(state) {
+        this.loading = true;
         try {
-            let url = this.data.link;
-            let res = await fetch(url, {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-                    'Referer': 'https://www.wnacg.com/'
-                }
-            });
-            let doc = HTMLParser.parse(await res.text());
-            let img = doc.querySelector('#picarea');
-            let src = img && (img.getAttribute('src') || img.getAttribute('data-src'));
-            if (!src) throw new Error('Could not find the full-size image on the WNACG page');
+            let pages = this.data.pages;
+            if (!pages || pages.length === 0) {
+                throw new Error('No image pages found in this WNACG chapter');
+            }
 
-            this.setData([{
-                url: new URL(src, url).toString(),
-                headers: { Referer: 'https://www.wnacg.com/' }
-            }]);
+            let images = [];
+            for (let start = 0; start < pages.length; start += 8) {
+                let batch = [];
+                for (let i = start; i < start + 8 && i < pages.length; ++i) {
+                    batch.push((async function(page) {
+                        let res = await fetch(page.link, {
+                            headers: {
+                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                                'Referer': 'https://www.wnacg.com/'
+                            }
+                        });
+                        let doc = HTMLParser.parse(await res.text());
+                        let img = doc.querySelector('#picarea');
+                        let src = img && (img.getAttribute('src') || img.getAttribute('data-src'));
+                        if (!src) throw new Error(`Could not find the full-size image at ${page.link}`);
+                        return {
+                            url: new URL(src, page.link).toString(),
+                            headers: { Referer: 'https://www.wnacg.com/' }
+                        };
+                    })(pages[i]));
+                }
+                let loaded = await Promise.all(batch);
+                for (let image of loaded) images.push(image);
+                this.setData(images);
+            }
             this.save(true, state);
         } catch (e) {
-            console.log(`WNACG image load failed: ${e}\n${e.stack}`);
+            console.log(`WNACG chapter load failed: ${e}\n${e.stack}`);
             showToast(`${e}`);
         } finally {
             this.loading = false;

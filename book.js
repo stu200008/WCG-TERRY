@@ -43,9 +43,13 @@ class BookController extends Controller {
             if (saved.title) this.data.title = saved.title;
             if (saved.summary) this.data.summary = saved.summary;
             if (saved.downloadUrl) this.data.downloadUrl = saved.downloadUrl;
-            this.data.list = saved.list || [];
+            let hasChapter = saved.list &&
+                saved.list.length === 1 &&
+                saved.list[0].pages &&
+                saved.list[0].pages.length > 0;
+            this.data.list = hasChapter ? saved.list : [];
 
-            if (new Date().getTime() - (saved.time || 0) > 30 * 60 * 1000) {
+            if (!hasChapter || new Date().getTime() - (saved.time || 0) > 30 * 60 * 1000) {
                 this.reload();
             }
         } else {
