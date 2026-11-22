@@ -1,8 +1,8 @@
 <scaffold>
     <refresh onRefresh="onRefresh" loading="$loading">
         <slivers>
-            <sliver-appbar expandedHeight="500" color="white" floating="true" pinned="true">
-                <FlexibleSpaceBar>
+            <sliver-appbar expandedHeight="220" color="white" floating="true" pinned="true">
+                <FlexibleSpaceBar padding="ltrb(20,0,0,64)">
                     <attr:background>
                         <stack>
                             <img src="$picture" headers="$pictureHeaders" fit="cover" width="infinity()" height="infinity()"/>
@@ -22,36 +22,9 @@
                             </view>
                         </stack>
                     </attr:background>
-                    <view width="infinity()" height="infinity()" padding="ltrb(20,80,20,0)">
-                        <column>
-                            <text lines="2" overflow="ellipsis">
-                                <span size="14">$title</span>
-                            </text>
-                            <row>
-                                <img src="$picture" headers="$pictureHeaders" width="120" height="160" fit="contain"/>
-                                <view width="8"/>
-                                <expanded>
-                                    <text lines="10" overflow="ellipsis">
-                                        <if candidate="isNotNull($tags)">
-                                            <span size="8" color="hex(#FFFFFF)">標籤：</span>
-                                            <for array="$tags">
-                                                <span alignment="middle">
-                                                    <button type="text" tapTargetSize="shrinkWrap" minimumSize="zero" padding="ltrb(2,1,2,1)">
-                                                        <attr:onPressed>
-                                                            <callback function="onTagPressed" args="array($item)"/>
-                                                        </attr:onPressed>
-                                                        <view color="hex(#0009)" padding="ltrb(3,1,3,1)">
-                                                            <text size="8" color="hex(#FFFFFF)">${item}</text>
-                                                        </view>
-                                                    </button>
-                                                </span>
-                                            </for>
-                                        </if>
-                                    </text>
-                                </expanded>
-                            </row>
-                        </column>
-                    </view>
+                    <text lines="3" overflow="ellipsis">
+                        <span size="14">$title</span>
+                    </text>
                 </FlexibleSpaceBar>
                 <attr:actions>
                     <button type="icon" onPressed="onSourcePressed">
@@ -69,8 +42,41 @@
                         <else><icon>favorite</icon></else>
                     </button>
                 </attr:actions>
-                <attr:bottom>
-                    <PreferredSize size="(infinity(), 48)">
+            </sliver-appbar>
+            <sliver-list-view itemCount="1">
+                <attr:builder>
+                    <Function returnType="Widget">
+                        <view color="color(canvas)" padding="ltrb(16,12,16,12)">
+                            <row>
+                                <img src="$picture" headers="$pictureHeaders" width="120" height="160" fit="contain"/>
+                                <view width="12"/>
+                                <expanded>
+                                    <text lines="10" overflow="ellipsis">
+                                        <if candidate="isNotNull($tags)">
+                                            <span size="8" color="color(primary)">標籤：</span>
+                                            <for array="$tags">
+                                                <span alignment="middle">
+                                                    <button type="text" tapTargetSize="shrinkWrap" minimumSize="zero" padding="ltrb(2,1,2,1)">
+                                                        <attr:onPressed>
+                                                            <callback function="onTagPressed" args="array($item)"/>
+                                                        </attr:onPressed>
+                                                        <view color="hex(#0009)" padding="ltrb(3,1,3,1)">
+                                                            <text size="8" color="hex(#FFFFFF)">${item}</text>
+                                                        </view>
+                                                    </button>
+                                                </span>
+                                            </for>
+                                        </if>
+                                    </text>
+                                </expanded>
+                            </row>
+                        </view>
+                    </Function>
+                </attr:builder>
+            </sliver-list-view>
+            <sliver-list-view itemCount="1">
+                <attr:builder>
+                    <Function returnType="Widget">
                         <view color="color(canvas)" height="48" padding="ltrb(10,0,10,0)">
                             <row>
                                 <icon color="color(primary)">bookmark</icon>
@@ -112,9 +118,9 @@
                                 </switch>
                             </row>
                         </view>
-                    </PreferredSize>
-                </attr:bottom>
-            </sliver-appbar>
+                    </Function>
+                </attr:builder>
+            </sliver-list-view>
             <sliver-list-view itemCount="length(${list})">
                 <attr:builder>
                     <Function returnType="Widget">
