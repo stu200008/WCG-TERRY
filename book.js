@@ -1,8 +1,9 @@
 const bookFetch = require('./book_fetch');
 const site = require('./site');
+const removeDates = require('./text');
 
 function cleanSubtitle(value) {
-    return (value || '')
+    return removeDates(value)
         .replace(/(?:總頁數|总页数|頁數|页数)\s*[:：]?\s*\d+\s*(?:頁|页|P|p)?/gi, '')
         .replace(/\d+\s*(?:頁|页|P|p)/gi, '')
         .replace(/\s*[|｜·,，]\s*/g, ' ')

@@ -2,6 +2,7 @@ const PER_PAGE = 20;
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 const rateLimitedFetch = require('./network');
 const site = require('./site');
+const removeDates = require('./text');
 
 class MainController extends Controller {
 
@@ -24,6 +25,14 @@ class MainController extends Controller {
             )
         )) {
             cached = null;
+        }
+
+        if (cached) {
+            for (let item of cached.items) {
+                if (typeof item.subtitle === 'string') {
+                    item.subtitle = removeDates(item.subtitle);
+                }
+            }
         }
 
         this.data = {
@@ -89,7 +98,7 @@ class MainController extends Controller {
                     Referer: referer,
                     'User-Agent': USER_AGENT
                 },
-                subtitle: info ? info.text.trim() : ''
+                subtitle: info ? removeDates(info.text) : ''
             });
         }
         return results;
