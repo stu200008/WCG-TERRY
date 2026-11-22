@@ -1,21 +1,21 @@
 <scaffold>
     <refresh onRefresh="onRefresh" loading="$loading">
         <slivers>
-            <sliver-appbar expandedHeight="56" color="color(canvas)" floating="true" pinned="true">
+            <sliver-appbar expandedHeight="56" color="hex(#0009)" floating="true" pinned="true">
                 <attr:actions>
                     <button type="icon" onPressed="onSourcePressed">
-                        <icon>open_in_browser</icon>
+                        <icon color="hex(#FFFFFF)">open_in_browser</icon>
                     </button>
                     <if candidate="isNotNull($downloadUrl)">
                         <button type="icon" onPressed="onArchivePressed">
-                            <icon>file_download</icon>
+                            <icon color="hex(#FFFFFF)">file_download</icon>
                         </button>
                     </if>
                     <button type="icon" onPressed="onFavoritePressed">
                         <if candidate="js(isFavarite)">
                             <icon color="red">favorite</icon>
                         </if>
-                        <else><icon>favorite</icon></else>
+                        <else><icon color="hex(#FFFFFF)">favorite</icon></else>
                     </button>
                 </attr:actions>
             </sliver-appbar>
@@ -25,9 +25,6 @@
                         <view height="270">
                             <stack>
                                 <img src="$picture" headers="$pictureHeaders" fit="cover" width="infinity()" height="infinity()"/>
-                                <filter filter="blur(4, 4)">
-                                    <view color="hex(#0000)"/>
-                                </filter>
                                 <view width="infinity()" height="infinity()">
                                     <attr:gradient>
                                         <LinearGradient begin="topCenter" end="bottomCenter">
