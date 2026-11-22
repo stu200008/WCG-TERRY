@@ -1,6 +1,15 @@
 const bookFetch = require('./book_fetch');
 const site = require('./site');
 
+function cleanSubtitle(value) {
+    return (value || '')
+        .replace(/(?:總頁數|总页数|頁數|页数)\s*[:：]?\s*\d+\s*(?:頁|页|P|p)?/gi, '')
+        .replace(/\d+\s*(?:頁|页|P|p)/gi, '')
+        .replace(/\s*[|｜·,，]\s*/g, ' ')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+}
+
 class BookController extends Controller {
 
     get bookInfo() {
@@ -26,9 +35,9 @@ class BookController extends Controller {
         this.url = site.normalizeCachedUrl(data.link);
         this.data = {
             title: data.title,
-            subtitle: data.subtitle,
+            subtitle: cleanSubtitle(data.subtitle),
             summary: data.summary,
-            tags: data.tags || [],
+            tags: data.tags && data.tags.length > 0 ? data.tags : null,
             picture: data.picture,
             pictureHeaders: {
                 Referer: this.url,
@@ -48,13 +57,13 @@ class BookController extends Controller {
             let saved = JSON.parse(cached);
             if (saved.title) this.data.title = saved.title;
             if (saved.summary) this.data.summary = saved.summary;
-            if (saved.version === 5 &&
+            if (saved.version === 6 &&
                 Array.isArray(saved.tags) &&
                 saved.tags.every(tag => typeof tag === 'string')) {
-                this.data.tags = saved.tags;
+                this.data.tags = saved.tags.length > 0 ? saved.tags : null;
             }
             if (saved.downloadUrl) this.data.downloadUrl = saved.downloadUrl;
-            let hasChapter = saved.version === 5 &&
+            let hasChapter = saved.version === 6 &&
                 Array.isArray(saved.list) &&
                 saved.list.length > 0 &&
                 saved.list.every(chapter =>
@@ -94,7 +103,7 @@ class BookController extends Controller {
             localStorage[`book:${this.url}`] = JSON.stringify(data);
             this.setState(() => {
                 this.data.summary = data.summary;
-                this.data.tags = data.tags;
+                this.data.tags = data.tags.length > 0 ? data.tags : null;
                 this.data.list = data.list;
                 this.data.downloadUrl = data.downloadUrl;
                 this.data.loading = false;

@@ -182,10 +182,9 @@ module.exports = async function(url, includeDownload, includeAllPages) {
             pages: imageUrls.map(imageUrl => ({ url: imageUrl }))
         }];
     }
-    let totalPages = chapters.reduce((total, chapter) => total + chapter.pages.length, 0);
     let result = {
-        version: 5,
-        summary: `${chapters.length} 章 / ${totalPages} 頁`,
+        version: 6,
+        summary: `${chapters.length} 章`,
         list: chapters,
         tags: parseTags(doc),
         downloadUrl: null,
