@@ -24,11 +24,6 @@
                     </attr:background>
                     <text lines="12" overflow="ellipsis">
                         <span size="14">$title</span>
-                        <span alignment="middle">
-                            <button type="text" tapTargetSize="shrinkWrap" minimumSize="zero" padding="ltrb(4,1,4,10)" onPressed="onSourcePressed">
-                                <text size="6" text="loc(source)"/>
-                            </button>
-                        </span>
                         <if candidate="isNotNull($subtitle)">
                             <span><view padding="ltrb(0,5,0,0)"/></span>
                             <span size="8">$subtitle</span>
@@ -56,6 +51,9 @@
                     </text>
                 </FlexibleSpaceBar>
                 <attr:actions>
+                    <button type="icon" onPressed="onSourcePressed">
+                        <icon>open_in_browser</icon>
+                    </button>
                     <if candidate="isNotNull($downloadUrl)">
                         <button type="icon" onPressed="onArchivePressed">
                             <icon>file_download</icon>
