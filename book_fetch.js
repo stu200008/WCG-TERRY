@@ -39,21 +39,35 @@ function parsePages(doc, url) {
     return pages;
 }
 
-function getAlbumPageCount(doc) {
-    let pageCount = 1;
-    for (let anchor of doc.querySelectorAll('a')) {
-        let href = anchor.getAttribute('href');
-        let match = href && href.match(/\/photos-index-page-(\d+)-aid-\d+\.html/);
-        if (match) pageCount = Math.max(pageCount, parseInt(match[1], 10));
-    }
-    return pageCount;
-}
+async function fetchImageUrls(url) {
+    let match = url.match(/\/photos-index-aid-(\d+)\.html(?:[?#].*)?$/);
+    if (!match) throw new Error(`Invalid WNACG album URL: ${url}`);
 
-function makeAlbumPageUrl(url, page) {
-    return url.replace(
-        /\/photos-index-aid-(\d+)\.html$/,
-        `/photos-index-page-${page}-aid-$1.html`
-    );
+    let imageListUrl = new URL(`/photos-item-aid-${match[1]}.html`, url).toString();
+    let text = await fetchText(imageListUrl);
+    let matchData = text.match(/"page_url"\s*:\s*(\[[\s\S]*?\])\s*,\s*"page_size"\s*:/);
+    if (!matchData) {
+        throw new Error(`Could not find the image URL list at ${imageListUrl}`);
+    }
+
+    let imageUrls;
+    try {
+        imageUrls = JSON.parse(matchData[1].replace(/,\s*\]/g, ']'));
+    } catch (e) {
+        throw new Error(`Could not parse the image URL list at ${imageListUrl}: ${e}`);
+    }
+    if (!Array.isArray(imageUrls) || imageUrls.length === 0) {
+        throw new Error(`No image URLs found at ${imageListUrl}`);
+    }
+
+    return imageUrls.map(function(imageUrl, index) {
+        if (typeof imageUrl !== 'string' || imageUrl.length === 0) {
+            throw new Error(`Invalid image URL at index ${index + 1} in ${imageListUrl}`);
+        }
+        let parsedUrl = new URL(imageUrl, SITE_URL);
+        if (parsedUrl.protocol === 'http:') parsedUrl.protocol = 'https:';
+        return parsedUrl.toString();
+    });
 }
 
 async function fetchDownloadUrl(url, albumDoc) {
@@ -85,26 +99,19 @@ module.exports = async function(url, includeDownload, includeAllPages) {
         throw new Error('No image pages found on the WNACG album');
     }
 
-    if (includeAllPages !== false) {
-        let pageCount = getAlbumPageCount(doc);
-        for (let page = 2; page <= pageCount; ++page) {
-            let pageUrl = makeAlbumPageUrl(url, page);
-            let pageDoc = HTMLParser.parse(await fetchText(pageUrl));
-            let pageItems = parsePages(pageDoc, pageUrl);
-            for (let item of pageItems) pages.push(item);
-        }
-    }
+    let imageUrls = await fetchImageUrls(url);
+    if (includeAllPages === false) imageUrls = imageUrls.slice(0, 1);
 
     let chapter = {
         title: '第 1 章',
-        subtitle: `${pages.length} 頁`,
+        subtitle: `${imageUrls.length} 頁`,
         link: url,
         picture: pages[0].picture,
         pictureHeaders: pages[0].pictureHeaders,
-        pages: pages
+        pages: imageUrls.map(imageUrl => ({ url: imageUrl }))
     };
     let result = {
-        summary: `1 章 / ${pages.length} 頁`,
+        summary: `1 章 / ${imageUrls.length} 頁`,
         list: [chapter],
         downloadUrl: null,
         downloadError: null
