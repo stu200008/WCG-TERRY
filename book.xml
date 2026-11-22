@@ -2,7 +2,7 @@
     <refresh onRefresh="onRefresh" loading="$loading">
         <slivers>
             <sliver-appbar expandedHeight="500" color="white" floating="true" pinned="true">
-                <FlexibleSpaceBar padding="ltrb(20,0,0,64)">
+                <FlexibleSpaceBar padding="ltrb(20,80,20,64)">
                     <attr:background>
                         <stack>
                             <img src="$picture" headers="$pictureHeaders" fit="cover" width="infinity()" height="infinity()"/>
