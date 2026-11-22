@@ -55,6 +55,7 @@
                             </view>
                         </stack>
                     </attr:background>
+                    <text lines="1"><span size="1" color="hex(#0000)"> </span></text>
                 </FlexibleSpaceBar>
                 <attr:actions>
                     <button type="icon" onPressed="onSourcePressed">
