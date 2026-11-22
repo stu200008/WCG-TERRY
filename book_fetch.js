@@ -156,7 +156,7 @@ module.exports = async function(url, includeDownload, includeAllPages) {
         let imageUrls = await fetchImageUrls(url);
         if (includeAllPages === false) imageUrls = imageUrls.slice(0, 1);
         chapters = [{
-            title: '第 1 章',
+            title: '--',
             subtitle: `${imageUrls.length} 頁`,
             link: url,
             picture: pages[0].picture,
