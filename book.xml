@@ -2,6 +2,15 @@
     <refresh onRefresh="onRefresh" loading="$loading">
         <slivers>
             <sliver-appbar expandedHeight="56" color="hex(#0009)" floating="true" pinned="true">
+                <FlexibleSpaceBar>
+                    <attr:background>
+                        <stack>
+                            <img src="$picture" headers="$pictureHeaders" fit="cover" width="infinity()" height="infinity()"/>
+                            <view width="infinity()" height="infinity()" color="hex(#0008)"/>
+                        </stack>
+                    </attr:background>
+                    <text lines="1"><span size="1" color="hex(#0000)"> </span></text>
+                </FlexibleSpaceBar>
                 <attr:actions>
                     <button type="icon" onPressed="onSourcePressed">
                         <icon color="hex(#FFFFFF)">open_in_browser</icon>
@@ -22,7 +31,7 @@
             <sliver-list-view itemCount="1">
                 <attr:builder>
                     <Function returnType="Widget">
-                        <view height="270">
+                        <view height="300">
                             <stack>
                                 <img src="$picture" headers="$pictureHeaders" fit="cover" width="infinity()" height="infinity()"/>
                                 <view width="infinity()" height="infinity()">
@@ -36,13 +45,13 @@
                                         </LinearGradient>
                                     </attr:gradient>
                                 </view>
-                                <view width="infinity()" height="infinity()" padding="ltrb(16,12,16,12)">
+                                <view width="infinity()" height="infinity()" padding="ltrb(16,8,16,0)">
                                     <column>
                                         <text lines="2" overflow="ellipsis">
-                                            <span size="14" color="hex(#FFFFFF)">$title</span>
+                                                    <span size="20" color="hex(#FFFFFF)">$title</span>
                                         </text>
                                         <row>
-                                            <img src="$picture" headers="$pictureHeaders" width="120" height="160" fit="contain"/>
+                                                    <img src="$picture" headers="$pictureHeaders" width="150" height="220" fit="contain"/>
                                             <view width="12"/>
                                             <expanded>
                                                 <text lines="10" overflow="ellipsis">
