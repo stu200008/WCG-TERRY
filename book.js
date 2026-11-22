@@ -47,15 +47,18 @@ class BookController extends Controller {
             if (saved.title) this.data.title = saved.title;
             if (saved.summary) this.data.summary = saved.summary;
             if (saved.downloadUrl) this.data.downloadUrl = saved.downloadUrl;
-            let chapterPages = saved.list &&
-                saved.list.length === 1 &&
-                saved.list[0].pages;
-            let hasChapter = Array.isArray(chapterPages) &&
-                chapterPages.length > 0 &&
-                chapterPages.every(page =>
-                    page &&
-                    typeof page.url === 'string' &&
-                    page.url.length > 0
+            let hasChapter = saved.version === 2 &&
+                Array.isArray(saved.list) &&
+                saved.list.length > 0 &&
+                saved.list.every(chapter =>
+                    chapter &&
+                    Array.isArray(chapter.pages) &&
+                    chapter.pages.length > 0 &&
+                    chapter.pages.every(page =>
+                        page &&
+                        typeof page.url === 'string' &&
+                        page.url.length > 0
+                    )
                 );
             this.data.list = hasChapter ? saved.list : [];
 

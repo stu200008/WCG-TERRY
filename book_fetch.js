@@ -40,8 +40,28 @@ function parsePages(doc, url) {
     return pages;
 }
 
+function parseChapters(doc, url) {
+    let links = doc.querySelectorAll('#sr_pub a');
+    let chapters = [];
+
+    for (let linkNode of links) {
+        let href = linkNode.getAttribute('href');
+        if (!href || !/\/photos-(?:slide|list)-aid-\d+-sid-\d+\.html(?:[?#].*)?$/i.test(href)) {
+            continue;
+        }
+
+        let title = linkNode.getAttribute('title') || linkNode.text.trim();
+        chapters.push({
+            title: title || `第 ${chapters.length + 1} 章`,
+            link: new URL(href, url).toString()
+        });
+    }
+    return chapters;
+}
+
 async function fetchImageUrls(url) {
-    let match = url.match(/\/photos-index-aid-(\d+)\.html(?:[?#].*)?$/);
+    let match = url.match(/\/photos-index-aid-(\d+)\.html(?:[?#].*)?$/) ||
+        url.match(/\/photos-(?:slide|list)-aid-(\d+)-sid-\d+\.html(?:[?#].*)?$/);
     if (!match) throw new Error(`Invalid WNACG album URL: ${url}`);
 
     let imageListUrl = new URL(`/photos-item-aid-${match[1]}.html`, url).toString();
@@ -71,6 +91,27 @@ async function fetchImageUrls(url) {
     });
 }
 
+async function fetchChapters(chapters, includeAllPages) {
+    let result = [];
+    for (let chapter of chapters) {
+        let imageUrls = await fetchImageUrls(chapter.link);
+        if (includeAllPages === false) imageUrls = imageUrls.slice(0, 1);
+        let headers = {
+            Referer: `${site.getOrigin(chapter.link)}/`,
+            'User-Agent': USER_AGENT
+        };
+        result.push({
+            title: chapter.title,
+            subtitle: `${imageUrls.length} 頁`,
+            link: chapter.link,
+            picture: imageUrls[0],
+            pictureHeaders: headers,
+            pages: imageUrls.map(imageUrl => ({ url: imageUrl }))
+        });
+    }
+    return result;
+}
+
 async function fetchDownloadUrl(url, albumDoc) {
     let downloadPage;
     let anchors = albumDoc.querySelectorAll('a');
@@ -96,25 +137,31 @@ async function fetchDownloadUrl(url, albumDoc) {
 module.exports = async function(url, includeDownload, includeAllPages) {
     url = await site.normalizeUrl(url);
     let doc = HTMLParser.parse(await fetchText(url));
-    let pages = parsePages(doc, url);
-    if (pages.length === 0) {
-        throw new Error('No image pages found on the WNACG album');
+    let chapterLinks = parseChapters(doc, url);
+    let chapters;
+    if (chapterLinks.length > 0) {
+        chapters = await fetchChapters(chapterLinks, includeAllPages);
+    } else {
+        let pages = parsePages(doc, url);
+        if (pages.length === 0) {
+            throw new Error('No image pages or chapters found on the WNACG album');
+        }
+        let imageUrls = await fetchImageUrls(url);
+        if (includeAllPages === false) imageUrls = imageUrls.slice(0, 1);
+        chapters = [{
+            title: '第 1 章',
+            subtitle: `${imageUrls.length} 頁`,
+            link: url,
+            picture: pages[0].picture,
+            pictureHeaders: pages[0].pictureHeaders,
+            pages: imageUrls.map(imageUrl => ({ url: imageUrl }))
+        }];
     }
-
-    let imageUrls = await fetchImageUrls(url);
-    if (includeAllPages === false) imageUrls = imageUrls.slice(0, 1);
-
-    let chapter = {
-        title: '第 1 章',
-        subtitle: `${imageUrls.length} 頁`,
-        link: url,
-        picture: pages[0].picture,
-        pictureHeaders: pages[0].pictureHeaders,
-        pages: imageUrls.map(imageUrl => ({ url: imageUrl }))
-    };
+    let totalPages = chapters.reduce((total, chapter) => total + chapter.pages.length, 0);
     let result = {
-        summary: `1 章 / ${imageUrls.length} 頁`,
-        list: [chapter],
+        version: 2,
+        summary: `${chapters.length} 章 / ${totalPages} 頁`,
+        list: chapters,
         downloadUrl: null,
         downloadError: null
     };
