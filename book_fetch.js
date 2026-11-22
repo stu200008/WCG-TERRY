@@ -1,13 +1,14 @@
 const SITE_URL = 'https://www.wnacg.com/';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
+const rateLimitedFetch = require('./network');
 
 async function fetchText(url) {
-    let res = await fetch(url, {
+    return await rateLimitedFetch(url, {
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
             'Referer': SITE_URL
         }
     });
-    return await res.text();
 }
 
 function parsePages(doc, url) {
@@ -29,7 +30,10 @@ function parsePages(doc, url) {
             title: title,
             link: new URL(link, url).toString(),
             picture: new URL(picture, url).toString(),
-            pictureHeaders: { Referer: SITE_URL }
+            pictureHeaders: {
+                Referer: SITE_URL,
+                'User-Agent': USER_AGENT
+            }
         });
     }
     return pages;

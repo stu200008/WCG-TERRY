@@ -1,5 +1,6 @@
 {
-  "name": "紳士漫畫",
+  "name": "WNACG",
+  "icon": "icon.png",
   "index": "index",
   "appbar_elevation": 0,
   "processor": "processor",

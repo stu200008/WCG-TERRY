@@ -1,5 +1,7 @@
 const PER_PAGE = 20;
 const SITE_URL = 'https://www.wnacg.com/';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
+const rateLimitedFetch = require('./network');
 
 class MainController extends Controller {
 
@@ -41,12 +43,11 @@ class MainController extends Controller {
     }
 
     async fetchPage(url) {
-        let res = await fetch(url, {
+        return await rateLimitedFetch(url, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
             }
         });
-        return await res.text();
     }
 
     parseData(text, url) {
@@ -69,7 +70,8 @@ class MainController extends Controller {
                 link: new URL(link, url).toString(),
                 picture: new URL(picture, url).toString(),
                 pictureHeaders: {
-                    Referer: SITE_URL
+                    Referer: SITE_URL,
+                    'User-Agent': USER_AGENT
                 },
                 subtitle: info ? info.text.trim() : ''
             });

@@ -1,4 +1,5 @@
 const bookFetch = require('./book_fetch');
+const rateLimitedFetch = require('./network');
 
 class WnacgProcessor extends Processor {
 
@@ -19,19 +20,22 @@ class WnacgProcessor extends Processor {
                 let batch = [];
                 for (let i = start; i < start + 8 && i < pages.length; ++i) {
                     batch.push((async function(page) {
-                        let res = await fetch(page.link, {
+                        let text = await rateLimitedFetch(page.link, {
                             headers: {
                                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
                                 'Referer': 'https://www.wnacg.com/'
                             }
                         });
-                        let doc = HTMLParser.parse(await res.text());
+                        let doc = HTMLParser.parse(text);
                         let img = doc.querySelector('#picarea');
                         let src = img && (img.getAttribute('src') || img.getAttribute('data-src'));
                         if (!src) throw new Error(`Could not find the full-size image at ${page.link}`);
                         return {
                             url: new URL(src, page.link).toString(),
-                            headers: { Referer: 'https://www.wnacg.com/' }
+                            headers: {
+                                Referer: 'https://www.wnacg.com/',
+                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+                            }
                         };
                     })(pages[i]));
                 }

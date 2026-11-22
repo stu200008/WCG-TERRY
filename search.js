@@ -1,5 +1,7 @@
 const SITE_URL = 'https://www.wnacg.com/';
 const SEARCH_URL = 'https://www.wnacg.com/search/index.php?q={0}&m=&syn=yes&f=_all&s=create_time_DESC';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
+const rateLimitedFetch = require('./network');
 
 class SearchController extends Controller {
 
@@ -93,12 +95,12 @@ class SearchController extends Controller {
     }
 
     async request(url, nextPage) {
-        let res = await fetch(url, {
+        let text = await rateLimitedFetch(url, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
             }
         });
-        let doc = HTMLParser.parse(await res.text());
+        let doc = HTMLParser.parse(text);
         let cards = doc.querySelectorAll('.gallary_wrap .gallary_item');
         let items = [];
         for (let card of cards) {
@@ -113,7 +115,10 @@ class SearchController extends Controller {
                 title: linkNode.getAttribute('title') || linkNode.text.trim(),
                 link: new URL(link, url).toString(),
                 picture: new URL(picture, url).toString(),
-                pictureHeaders: { Referer: SITE_URL },
+                pictureHeaders: {
+                    Referer: SITE_URL,
+                    'User-Agent': USER_AGENT
+                },
                 subtitle: info ? info.text.trim() : ''
             });
         }
