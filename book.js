@@ -47,7 +47,7 @@ class BookController extends Controller {
             if (saved.title) this.data.title = saved.title;
             if (saved.summary) this.data.summary = saved.summary;
             if (saved.downloadUrl) this.data.downloadUrl = saved.downloadUrl;
-            let hasChapter = saved.version === 2 &&
+            let hasChapter = saved.version === 3 &&
                 Array.isArray(saved.list) &&
                 saved.list.length > 0 &&
                 saved.list.every(chapter =>

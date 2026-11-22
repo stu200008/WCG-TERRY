@@ -41,14 +41,21 @@ function parsePages(doc, url) {
 }
 
 function parseChapters(doc, url) {
-    let links = doc.querySelectorAll('#sr_pub a');
+    let anchors = doc.querySelectorAll('a');
+    let links = [];
+    for (let anchor of anchors) {
+        if (anchor.getAttribute('data-chid')) links.push(anchor);
+    }
+    if (links.length === 0) links = anchors;
+
     let chapters = [];
+    let seen = {};
 
     for (let linkNode of links) {
         let href = linkNode.getAttribute('href');
-        if (!href || !/\/photos-(?:slide|list)-aid-\d+-sid-\d+\.html(?:[?#].*)?$/i.test(href)) {
-            continue;
-        }
+        let match = href && href.match(/\/photos-(?:slide|list)-aid-(\d+)-sid-\d+\.html(?:[?#].*)?$/i);
+        if (!match || seen[match[1]]) continue;
+        seen[match[1]] = true;
 
         let title = linkNode.getAttribute('title') || linkNode.text.trim();
         chapters.push({
@@ -159,7 +166,7 @@ module.exports = async function(url, includeDownload, includeAllPages) {
     }
     let totalPages = chapters.reduce((total, chapter) => total + chapter.pages.length, 0);
     let result = {
-        version: 2,
+        version: 3,
         summary: `${chapters.length} 章 / ${totalPages} 頁`,
         list: chapters,
         downloadUrl: null,
