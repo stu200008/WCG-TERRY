@@ -3,7 +3,7 @@ const rateLimitedFetch = require('./network');
 const site = require('./site');
 
 async function fetchText(url) {
-    let referer = `${new URL(url).origin}/`;
+    let referer = `${site.getOrigin(url)}/`;
     return await rateLimitedFetch(url, {
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
@@ -32,7 +32,7 @@ function parsePages(doc, url) {
             link: new URL(link, url).toString(),
             picture: new URL(picture, url).toString(),
             pictureHeaders: {
-                Referer: `${new URL(url).origin}/`,
+                Referer: `${site.getOrigin(url)}/`,
                 'User-Agent': USER_AGENT
             }
         });
@@ -65,8 +65,8 @@ async function fetchImageUrls(url) {
         if (typeof imageUrl !== 'string' || imageUrl.length === 0) {
             throw new Error(`Invalid image URL at index ${index + 1} in ${imageListUrl}`);
         }
-        let parsedUrl = new URL(imageUrl, url);
-        if (parsedUrl.protocol === 'http:') parsedUrl.protocol = 'https:';
+        let secureUrl = imageUrl.replace(/^http:/i, 'https:');
+        let parsedUrl = new URL(secureUrl, url);
         return parsedUrl.toString();
     });
 }

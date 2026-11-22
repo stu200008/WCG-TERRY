@@ -1,6 +1,7 @@
 const PER_PAGE = 20;
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 const rateLimitedFetch = require('./network');
+const site = require('./site');
 
 class MainController extends Controller {
 
@@ -68,7 +69,7 @@ class MainController extends Controller {
         let doc = HTMLParser.parse(text);
         let cards = doc.querySelectorAll('.gallary_wrap .gallary_item');
         let results = [];
-        let referer = `${new URL(url).origin}/`;
+        let referer = `${site.getOrigin(url)}/`;
 
         for (let card of cards) {
             let linkNode = card.querySelector('.info .title a') || card.querySelector('.pic_box a');

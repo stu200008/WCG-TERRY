@@ -24,9 +24,7 @@ class SearchController extends Controller {
 
     async makeURL(text) {
         this.siteBase = await site.getBase();
-        let url = new URL('/search/index.php', this.siteBase);
-        url.search = `q=${encodeURIComponent(text)}&m=&syn=yes&f=_all&s=create_time_DESC`;
-        return url.toString();
+        return `${this.siteBase}search/index.php?q=${encodeURIComponent(text)}&m=&syn=yes&f=_all&s=create_time_DESC`;
     }
 
     onSearchClicked() {
@@ -103,7 +101,7 @@ class SearchController extends Controller {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
             }
         });
-        let referer = `${new URL(url).origin}/`;
+        let referer = `${site.getOrigin(url)}/`;
         let doc = HTMLParser.parse(text);
         let cards = doc.querySelectorAll('.gallary_wrap .gallary_item');
         let items = [];

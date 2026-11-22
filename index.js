@@ -41,7 +41,7 @@ class IndexController extends Controller {
     async refreshTabs() {
         try {
             let base = await site.getBase();
-            if (new URL(this.data.tabs[0].url).origin !== new URL(base).origin) {
+            if (site.getOrigin(this.data.tabs[0].url) !== site.getOrigin(base)) {
                 this.setState(() => {
                     this.data.tabs = buildTabs(base);
                 });

@@ -11,6 +11,17 @@ function isWnacgHost(host) {
     return /^(?:www\.)?wnacg\.(?:[a-z0-9-]+\.)*[a-z0-9-]+$/i.test(host);
 }
 
+function getOrigin(url) {
+    let text = new URL(url).toString();
+    let match = text.match(/^(https?:\/\/[^/]+)/i);
+    if (!match) throw new Error(`Could not determine the domain for ${url}`);
+    return match[1];
+}
+
+function getHost(url) {
+    return getOrigin(url).replace(/^https?:\/\//i, '').toLowerCase();
+}
+
 async function resolveBase() {
     let text = await rateLimitedFetch(RELEASE_URL, {
         headers: { 'User-Agent': USER_AGENT }
@@ -22,16 +33,15 @@ async function resolveBase() {
         let href = anchor.getAttribute('href');
         if (!href) continue;
 
-        let url;
+        let candidate;
         try {
-            url = new URL(href, RELEASE_URL);
+            candidate = new URL(href, RELEASE_URL).toString().replace(/^http:/i, 'https:');
         } catch (e) {
             continue;
         }
-        if (!isWnacgHost(url.hostname)) continue;
+        if (!isWnacgHost(getHost(candidate))) continue;
 
-        url.protocol = 'https:';
-        let base = `${url.origin}/`;
+        let base = `${getOrigin(candidate)}/`;
         if (candidates.indexOf(base) < 0) candidates.push(base);
     }
 
@@ -72,9 +82,8 @@ async function getBase(force) {
     }).catch(error => {
         let saved = localStorage['wnacg:base'];
         if (saved) {
-            let url = new URL(saved);
-            if (isWnacgHost(url.hostname)) {
-                cachedBase = `${url.origin}/`;
+            if (isWnacgHost(getHost(saved))) {
+                cachedBase = `${getOrigin(saved)}/`;
                 cachedAt = Date.now();
                 showToast(`Could not refresh the WNACG address; using the last known domain. ${error}`);
                 return cachedBase;
@@ -100,21 +109,17 @@ function getCachedBase() {
     if (!saved) return null;
 
     try {
-        let url = new URL(saved);
-        if (isWnacgHost(url.hostname)) return `${url.origin}/`;
+        if (isWnacgHost(getHost(saved))) return `${getOrigin(saved)}/`;
     } catch (e) {
     }
     return null;
 }
 
 function normalizeWithBase(url, base) {
-    let target = new URL(url, base);
-    if (isWnacgHost(target.hostname)) {
-        let current = new URL(base);
-        target.protocol = current.protocol;
-        target.host = current.host;
-    }
-    return target.toString();
+    let target = new URL(url, base).toString();
+    let targetOrigin = getOrigin(target);
+    if (!isWnacgHost(getHost(target))) return target;
+    return `${getOrigin(base)}${target.slice(targetOrigin.length)}`;
 }
 
 function normalizeCachedUrl(url) {
@@ -129,6 +134,7 @@ async function normalizeUrl(url) {
 module.exports = {
     getBase: getBase,
     getCachedBase: getCachedBase,
+    getOrigin: getOrigin,
     normalizeUrl: normalizeUrl,
     normalizeCachedUrl: normalizeCachedUrl
 };

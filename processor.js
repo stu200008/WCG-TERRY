@@ -12,7 +12,7 @@ class WnacgProcessor extends Processor {
         this.loading = true;
         try {
             let albumUrl = await site.normalizeUrl(this.data.link);
-            let referer = `${new URL(albumUrl).origin}/`;
+            let referer = `${site.getOrigin(albumUrl)}/`;
             let pages = this.data.pages;
             if (!pages || pages.length === 0) {
                 throw new Error('No image pages found in this WNACG chapter');
