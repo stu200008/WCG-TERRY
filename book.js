@@ -16,6 +16,7 @@ class BookController extends Controller {
                 subtitle: this.data.subtitle,
                 picture: this.data.picture,
                 summary: this.data.summary,
+                tags: this.data.tags,
                 downloadUrl: this.data.downloadUrl
             }
         };
@@ -27,6 +28,7 @@ class BookController extends Controller {
             title: data.title,
             subtitle: data.subtitle,
             summary: data.summary,
+            tags: data.tags || [],
             picture: data.picture,
             pictureHeaders: {
                 Referer: this.url,
@@ -46,8 +48,9 @@ class BookController extends Controller {
             let saved = JSON.parse(cached);
             if (saved.title) this.data.title = saved.title;
             if (saved.summary) this.data.summary = saved.summary;
+            if (Array.isArray(saved.tags)) this.data.tags = saved.tags;
             if (saved.downloadUrl) this.data.downloadUrl = saved.downloadUrl;
-            let hasChapter = saved.version === 3 &&
+            let hasChapter = saved.version === 4 &&
                 Array.isArray(saved.list) &&
                 saved.list.length > 0 &&
                 saved.list.every(chapter =>
@@ -87,6 +90,7 @@ class BookController extends Controller {
             localStorage[`book:${this.url}`] = JSON.stringify(data);
             this.setState(() => {
                 this.data.summary = data.summary;
+                this.data.tags = data.tags;
                 this.data.list = data.list;
                 this.data.downloadUrl = data.downloadUrl;
                 this.data.loading = false;
@@ -186,6 +190,18 @@ class BookController extends Controller {
 
     onSourcePressed() {
         this.openBrowser(this.url);
+    }
+
+    async onTagPressed(index) {
+        let tag = this.data.tags[index];
+        if (!tag || !tag.url || !tag.pageUrl || !tag.id) return;
+        await this.navigateTo('main', {
+            data: {
+                id: tag.id,
+                url: tag.url,
+                pageUrl: tag.pageUrl
+            }
+        });
     }
 
     isSelected(index) {

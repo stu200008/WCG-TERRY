@@ -66,6 +66,30 @@ function parseChapters(doc, url) {
     return chapters;
 }
 
+function parseTags(doc, url) {
+    let anchors = doc.querySelectorAll('a');
+    let tags = [];
+    let seen = {};
+
+    for (let anchor of anchors) {
+        let href = anchor.getAttribute('href');
+        let match = href && href.match(/\/albums-index-tag-(.+?)\.html(?:[?#].*)?$/i);
+        if (!match || seen[match[1]]) continue;
+
+        let title = anchor.text.trim();
+        if (!title) continue;
+        seen[match[1]] = true;
+        let tagUrl = new URL(href, url).toString();
+        tags.push({
+            title: title,
+            id: `tag-${match[1]}`,
+            url: tagUrl,
+            pageUrl: tagUrl.replace('/albums-index-tag-', '/albums-index-page-{0}-tag-')
+        });
+    }
+    return tags;
+}
+
 async function fetchImageUrls(url) {
     let match = url.match(/\/photos-index-aid-(\d+)\.html(?:[?#].*)?$/) ||
         url.match(/\/photos-(?:slide|list)-aid-(\d+)-sid-\d+\.html(?:[?#].*)?$/);
@@ -166,9 +190,10 @@ module.exports = async function(url, includeDownload, includeAllPages) {
     }
     let totalPages = chapters.reduce((total, chapter) => total + chapter.pages.length, 0);
     let result = {
-        version: 3,
+        version: 4,
         summary: `${chapters.length} 章 / ${totalPages} 頁`,
         list: chapters,
+        tags: parseTags(doc, url),
         downloadUrl: null,
         downloadError: null
     };

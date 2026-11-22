@@ -98,6 +98,21 @@
                     </PreferredSize>
                 </attr:bottom>
             </sliver-appbar>
+            <sliver-list-view itemCount="length(${tags})">
+                <attr:builder>
+                    <Function returnType="Widget">
+                        <script>
+                            set("tag", ${tags[args[1]]})
+                        </script>
+                        <list-item>
+                            <attr:onTap><callback function="onTagPressed" args="array(${args[1]})"/></attr:onTap>
+                            <attr:leading><icon color="color(primary)">label</icon></attr:leading>
+                            <attr:title><text>${tag.title}</text></attr:title>
+                            <attr:trailing><icon>chevron_right</icon></attr:trailing>
+                        </list-item>
+                    </Function>
+                </attr:builder>
+            </sliver-list-view>
             <sliver-list-view itemCount="length(${list})">
                 <attr:builder>
                     <Function returnType="Widget">
