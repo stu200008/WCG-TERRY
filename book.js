@@ -21,8 +21,8 @@ class BookController extends Controller {
         };
     }
 
-    async load(data) {
-        this.url = await site.normalizeUrl(data.link);
+    load(data) {
+        this.url = site.normalizeCachedUrl(data.link);
         this.data = {
             title: data.title,
             subtitle: data.subtitle,

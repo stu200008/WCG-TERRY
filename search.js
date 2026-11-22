@@ -4,8 +4,8 @@ const site = require('./site');
 
 class SearchController extends Controller {
 
-    async load() {
-        this.siteBase = await site.getBase();
+    load() {
+        this.siteBase = site.getCachedBase();
         let hints = [];
         let saved = localStorage['hints'];
         if (saved) {
@@ -22,7 +22,8 @@ class SearchController extends Controller {
         };
     }
 
-    makeURL(text) {
+    async makeURL(text) {
+        this.siteBase = await site.getBase();
         let url = new URL('/search/index.php', this.siteBase);
         url.search = `q=${encodeURIComponent(text)}&m=&syn=yes&f=_all&s=create_time_DESC`;
         return url.toString();
@@ -62,7 +63,7 @@ class SearchController extends Controller {
             this.data.loading = true;
         });
         try {
-            let result = await this.request(this.makeURL(text), 2);
+            let result = await this.request(await this.makeURL(text), 2);
             this.key = text;
             this.page = 1;
             this.nextURL = result.nextUrl;
@@ -140,7 +141,7 @@ class SearchController extends Controller {
     async onRefresh() {
         if (!this.key) return;
         try {
-            let result = await this.request(this.makeURL(this.key), 2);
+            let result = await this.request(await this.makeURL(this.key), 2);
             this.page = 1;
             this.nextURL = result.nextUrl;
             this.setState(() => {

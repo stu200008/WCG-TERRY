@@ -93,8 +93,21 @@ async function getBase(force) {
     return resolving;
 }
 
-async function normalizeUrl(url) {
-    let base = await getBase();
+function getCachedBase() {
+    if (cachedBase) return cachedBase;
+
+    let saved = localStorage['wnacg:base'];
+    if (!saved) return null;
+
+    try {
+        let url = new URL(saved);
+        if (isWnacgHost(url.hostname)) return `${url.origin}/`;
+    } catch (e) {
+    }
+    return null;
+}
+
+function normalizeWithBase(url, base) {
     let target = new URL(url, base);
     if (isWnacgHost(target.hostname)) {
         let current = new URL(base);
@@ -104,7 +117,18 @@ async function normalizeUrl(url) {
     return target.toString();
 }
 
+function normalizeCachedUrl(url) {
+    let base = getCachedBase();
+    return base ? normalizeWithBase(url, base) : url;
+}
+
+async function normalizeUrl(url) {
+    return normalizeWithBase(url, await getBase());
+}
+
 module.exports = {
     getBase: getBase,
-    normalizeUrl: normalizeUrl
+    getCachedBase: getCachedBase,
+    normalizeUrl: normalizeUrl,
+    normalizeCachedUrl: normalizeCachedUrl
 };
