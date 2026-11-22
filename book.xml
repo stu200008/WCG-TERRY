@@ -1,7 +1,7 @@
 <scaffold>
     <refresh onRefresh="onRefresh" loading="$loading">
         <slivers>
-            <sliver-appbar expandedHeight="360" color="white" floating="true" pinned="true">
+            <sliver-appbar expandedHeight="420" color="white" floating="true" pinned="true">
                 <FlexibleSpaceBar padding="ltrb(20,0,0,64)">
                     <attr:background>
                         <stack>
@@ -19,6 +19,9 @@
                                         </attr:colors>
                                     </LinearGradient>
                                 </attr:gradient>
+                            </view>
+                            <view width="infinity()" height="infinity()" alignment="topCenter" padding="ltrb(0,24,0,0)">
+                                <img src="$picture" headers="$pictureHeaders" width="160" height="210" fit="contain"/>
                             </view>
                         </stack>
                     </attr:background>
