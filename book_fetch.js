@@ -87,19 +87,11 @@ module.exports = async function(url, includeDownload, includeAllPages) {
 
     if (includeAllPages !== false) {
         let pageCount = getAlbumPageCount(doc);
-        for (let start = 2; start <= pageCount; start += 4) {
-            let pageNumbers = [];
-            for (let page = start; page < start + 4 && page <= pageCount; ++page) {
-                pageNumbers.push(page);
-            }
-            let batches = await Promise.all(pageNumbers.map(async function(page) {
-                let pageUrl = makeAlbumPageUrl(url, page);
-                let pageDoc = HTMLParser.parse(await fetchText(pageUrl));
-                return parsePages(pageDoc, pageUrl);
-            }));
-            for (let batch of batches) {
-                for (let item of batch) pages.push(item);
-            }
+        for (let page = 2; page <= pageCount; ++page) {
+            let pageUrl = makeAlbumPageUrl(url, page);
+            let pageDoc = HTMLParser.parse(await fetchText(pageUrl));
+            let pageItems = parsePages(pageDoc, pageUrl);
+            for (let item of pageItems) pages.push(item);
         }
     }
 
