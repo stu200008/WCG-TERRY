@@ -22,7 +22,7 @@
                             </view>
                         </stack>
                     </attr:background>
-                    <text lines="8" overflow="ellipsis">
+                    <text lines="12" overflow="ellipsis">
                         <span size="14">$title</span>
                         <span alignment="middle">
                             <button type="text" tapTargetSize="shrinkWrap" minimumSize="zero" padding="ltrb(4,1,4,10)" onPressed="onSourcePressed">
@@ -36,6 +36,20 @@
                         <if candidate="isNotNull($summary)">
                             <span><view padding="ltrb(0,5,0,0)"/></span>
                             <span size="8">$summary</span>
+                        </if>
+                        <if candidate="length(${tags}) > 0">
+                            <span><view padding="ltrb(0,5,0,0)"/></span>
+                            <span size="8">標籤：</span>
+                            <for array="$tags">
+                                <span alignment="middle">
+                                    <button type="text" tapTargetSize="shrinkWrap" minimumSize="zero" padding="ltrb(2,1,2,1)">
+                                        <attr:onPressed>
+                                            <callback function="onTagPressed" args="array($item)"/>
+                                        </attr:onPressed>
+                                        <text size="8">${item}</text>
+                                    </button>
+                                </span>
+                            </for>
                         </if>
                     </text>
                 </FlexibleSpaceBar>
@@ -98,21 +112,6 @@
                     </PreferredSize>
                 </attr:bottom>
             </sliver-appbar>
-            <sliver-list-view itemCount="length(${tags})">
-                <attr:builder>
-                    <Function returnType="Widget">
-                        <script>
-                            set("tag", ${tags[args[1]]})
-                        </script>
-                        <list-item>
-                            <attr:onTap><callback function="onTagPressed" args="array(${args[1]})"/></attr:onTap>
-                            <attr:leading><icon color="color(primary)">label</icon></attr:leading>
-                            <attr:title><text>${tag.title}</text></attr:title>
-                            <attr:trailing><icon>chevron_right</icon></attr:trailing>
-                        </list-item>
-                    </Function>
-                </attr:builder>
-            </sliver-list-view>
             <sliver-list-view itemCount="length(${list})">
                 <attr:builder>
                     <Function returnType="Widget">

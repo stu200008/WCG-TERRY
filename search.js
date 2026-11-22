@@ -4,8 +4,9 @@ const site = require('./site');
 
 class SearchController extends Controller {
 
-    load() {
+    load(data) {
         this.siteBase = site.getCachedBase();
+        let query = data && typeof data.query === 'string' ? data.query : '';
         let hints = [];
         let saved = localStorage['hints'];
         if (saved) {
@@ -16,10 +17,11 @@ class SearchController extends Controller {
             list: [],
             focus: false,
             hints: hints,
-            text: '',
+            text: query,
             loading: false,
             hasMore: false
         };
+        if (query) this.onTextSubmit(query);
     }
 
     async makeURL(text) {

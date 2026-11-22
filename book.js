@@ -48,9 +48,13 @@ class BookController extends Controller {
             let saved = JSON.parse(cached);
             if (saved.title) this.data.title = saved.title;
             if (saved.summary) this.data.summary = saved.summary;
-            if (Array.isArray(saved.tags)) this.data.tags = saved.tags;
+            if (saved.version === 5 &&
+                Array.isArray(saved.tags) &&
+                saved.tags.every(tag => typeof tag === 'string')) {
+                this.data.tags = saved.tags;
+            }
             if (saved.downloadUrl) this.data.downloadUrl = saved.downloadUrl;
-            let hasChapter = saved.version === 4 &&
+            let hasChapter = saved.version === 5 &&
                 Array.isArray(saved.list) &&
                 saved.list.length > 0 &&
                 saved.list.every(chapter =>
@@ -192,15 +196,10 @@ class BookController extends Controller {
         this.openBrowser(this.url);
     }
 
-    async onTagPressed(index) {
-        let tag = this.data.tags[index];
-        if (!tag || !tag.url || !tag.pageUrl || !tag.id) return;
-        await this.navigateTo('main', {
-            data: {
-                id: tag.id,
-                url: tag.url,
-                pageUrl: tag.pageUrl
-            }
+    async onTagPressed(tag) {
+        if (typeof tag !== 'string' || tag.length === 0) return;
+        await this.navigateTo('search', {
+            data: { query: tag }
         });
     }
 
