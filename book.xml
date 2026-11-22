@@ -1,15 +1,60 @@
 <scaffold>
     <refresh onRefresh="onRefresh" loading="$loading">
         <slivers>
-            <sliver-appbar expandedHeight="56" color="hex(#0009)" floating="true" pinned="true">
+            <sliver-appbar expandedHeight="356" color="hex(#0000)" floating="true" pinned="true">
                 <FlexibleSpaceBar>
                     <attr:background>
                         <stack>
                             <img src="$picture" headers="$pictureHeaders" fit="cover" width="infinity()" height="infinity()"/>
-                            <view width="infinity()" height="infinity()" color="hex(#0008)"/>
+                            <view width="infinity()" height="infinity()">
+                                <attr:gradient>
+                                    <LinearGradient begin="topCenter" end="bottomCenter">
+                                        <attr:colors>
+                                            <color>hex(#0007)</color>
+                                            <color>hex(#0003)</color>
+                                            <color>hex(#0007)</color>
+                                        </attr:colors>
+                                    </LinearGradient>
+                                </attr:gradient>
+                            </view>
+                            <view width="infinity()" height="infinity()" padding="ltrb(0,56,0,0)">
+                                <view height="300">
+                                    <stack>
+                                        <view width="infinity()" height="infinity()" padding="ltrb(16,8,16,0)">
+                                            <column>
+                                                <text lines="2" overflow="ellipsis">
+                                                    <span size="20" color="hex(#FFFFFF)">$title</span>
+                                                </text>
+                                                <row>
+                                                    <img src="$picture" headers="$pictureHeaders" width="150" height="220" fit="contain"/>
+                                                    <view width="12"/>
+                                                    <expanded>
+                                                        <text lines="10" overflow="ellipsis">
+                                                            <if candidate="isNotNull($tags)">
+                                                                <span size="10" color="hex(#FFFFFF)">標籤：</span>
+                                                                <for array="$tags">
+                                                                    <span alignment="middle">
+                                                                        <button type="text" tapTargetSize="shrinkWrap" minimumSize="zero" padding="ltrb(3,1,3,1)">
+                                                                            <attr:onPressed>
+                                                                                <callback function="onTagPressed" args="array($item)"/>
+                                                                            </attr:onPressed>
+                                                                            <view color="hex(#0009)" padding="ltrb(4,2,4,2)">
+                                                                                <text size="10" color="hex(#FFFFFF)">${item}</text>
+                                                                            </view>
+                                                                        </button>
+                                                                    </span>
+                                                                </for>
+                                                            </if>
+                                                        </text>
+                                                    </expanded>
+                                                </row>
+                                            </column>
+                                        </view>
+                                    </stack>
+                                </view>
+                            </view>
                         </stack>
                     </attr:background>
-                    <text lines="1"><span size="1" color="hex(#0000)"> </span></text>
                 </FlexibleSpaceBar>
                 <attr:actions>
                     <button type="icon" onPressed="onSourcePressed">
@@ -28,58 +73,6 @@
                     </button>
                 </attr:actions>
             </sliver-appbar>
-            <sliver-list-view itemCount="1">
-                <attr:builder>
-                    <Function returnType="Widget">
-                        <view height="300">
-                            <stack>
-                                <img src="$picture" headers="$pictureHeaders" fit="cover" width="infinity()" height="infinity()"/>
-                                <view width="infinity()" height="infinity()">
-                                    <attr:gradient>
-                                        <LinearGradient begin="topCenter" end="bottomCenter">
-                                            <attr:colors>
-                                                <color>hex(#0007)</color>
-                                                <color>hex(#0003)</color>
-                                                <color>hex(#0007)</color>
-                                            </attr:colors>
-                                        </LinearGradient>
-                                    </attr:gradient>
-                                </view>
-                                <view width="infinity()" height="infinity()" padding="ltrb(16,8,16,0)">
-                                    <column>
-                                        <text lines="2" overflow="ellipsis">
-                                                    <span size="20" color="hex(#FFFFFF)">$title</span>
-                                        </text>
-                                        <row>
-                                                    <img src="$picture" headers="$pictureHeaders" width="150" height="220" fit="contain"/>
-                                            <view width="12"/>
-                                            <expanded>
-                                                <text lines="10" overflow="ellipsis">
-                                                    <if candidate="isNotNull($tags)">
-                                                        <span size="10" color="hex(#FFFFFF)">標籤：</span>
-                                                        <for array="$tags">
-                                                            <span alignment="middle">
-                                                                <button type="text" tapTargetSize="shrinkWrap" minimumSize="zero" padding="ltrb(3,1,3,1)">
-                                                                    <attr:onPressed>
-                                                                        <callback function="onTagPressed" args="array($item)"/>
-                                                                    </attr:onPressed>
-                                                                    <view color="hex(#0009)" padding="ltrb(4,2,4,2)">
-                                                                        <text size="10" color="hex(#FFFFFF)">${item}</text>
-                                                                    </view>
-                                                                </button>
-                                                            </span>
-                                                        </for>
-                                                    </if>
-                                                </text>
-                                            </expanded>
-                                        </row>
-                                    </column>
-                                </view>
-                            </stack>
-                        </view>
-                    </Function>
-                </attr:builder>
-            </sliver-list-view>
             <sliver-list-view itemCount="1">
                 <attr:builder>
                     <Function returnType="Widget">
