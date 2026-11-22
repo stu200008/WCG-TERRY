@@ -12,7 +12,17 @@ class MainController extends Controller {
         this.page = 0;
 
         let cached = this.readCache();
-        if (cached && (!cached.items || cached.items.length === 0)) {
+        if (cached && (
+            !Array.isArray(cached.items) ||
+            cached.items.length === 0 ||
+            cached.items.some(item =>
+                !item ||
+                typeof item.link !== 'string' ||
+                item.link.length === 0 ||
+                typeof item.picture !== 'string' ||
+                item.picture.length === 0
+            )
+        )) {
             cached = null;
         }
 
@@ -28,8 +38,13 @@ class MainController extends Controller {
     }
 
     async onPressed(index) {
+        let item = this.data.list[index];
+        if (!item || typeof item.link !== 'string' || item.link.length === 0) {
+            showToast('This WNACG item has no album URL. Refresh the list and try again.');
+            return;
+        }
         await this.navigateTo('book', {
-            data: this.data.list[index]
+            data: item
         });
     }
 
