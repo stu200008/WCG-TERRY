@@ -1,12 +1,13 @@
-const SITE_URL = 'https://www.wnacg.com/';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 const rateLimitedFetch = require('./network');
+const site = require('./site');
 
 async function fetchText(url) {
+    let referer = `${new URL(url).origin}/`;
     return await rateLimitedFetch(url, {
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-            'Referer': SITE_URL
+            'Referer': referer
         }
     });
 }
@@ -31,7 +32,7 @@ function parsePages(doc, url) {
             link: new URL(link, url).toString(),
             picture: new URL(picture, url).toString(),
             pictureHeaders: {
-                Referer: SITE_URL,
+                Referer: `${new URL(url).origin}/`,
                 'User-Agent': USER_AGENT
             }
         });
@@ -64,7 +65,7 @@ async function fetchImageUrls(url) {
         if (typeof imageUrl !== 'string' || imageUrl.length === 0) {
             throw new Error(`Invalid image URL at index ${index + 1} in ${imageListUrl}`);
         }
-        let parsedUrl = new URL(imageUrl, SITE_URL);
+        let parsedUrl = new URL(imageUrl, url);
         if (parsedUrl.protocol === 'http:') parsedUrl.protocol = 'https:';
         return parsedUrl.toString();
     });
@@ -93,6 +94,7 @@ async function fetchDownloadUrl(url, albumDoc) {
 }
 
 module.exports = async function(url, includeDownload, includeAllPages) {
+    url = await site.normalizeUrl(url);
     let doc = HTMLParser.parse(await fetchText(url));
     let pages = parsePages(doc, url);
     if (pages.length === 0) {

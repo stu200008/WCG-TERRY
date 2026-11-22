@@ -1,5 +1,6 @@
 const bookFetch = require('./book_fetch');
 const rateLimitedFetch = require('./network');
+const site = require('./site');
 
 class WnacgProcessor extends Processor {
 
@@ -10,6 +11,8 @@ class WnacgProcessor extends Processor {
     async load(state) {
         this.loading = true;
         try {
+            let albumUrl = await site.normalizeUrl(this.data.link);
+            let referer = `${new URL(albumUrl).origin}/`;
             let pages = this.data.pages;
             if (!pages || pages.length === 0) {
                 throw new Error('No image pages found in this WNACG chapter');
@@ -25,9 +28,9 @@ class WnacgProcessor extends Processor {
             if (directImages) {
                 for (let page of pages) {
                     images.push({
-                        url: new URL(page.url, 'https://www.wnacg.com/').toString(),
+                        url: new URL(page.url, albumUrl).toString(),
                         headers: {
-                            Referer: 'https://www.wnacg.com/',
+                            Referer: referer,
                             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
                         }
                     });
@@ -39,21 +42,22 @@ class WnacgProcessor extends Processor {
                     if (!page || typeof page.link !== 'string' || page.link.length === 0) {
                         throw new Error(`Invalid WNACG image page at index ${i + 1}`);
                     }
+                    let pageUrl = await site.normalizeUrl(page.link);
 
-                    let text = await rateLimitedFetch(page.link, {
+                    let text = await rateLimitedFetch(pageUrl, {
                         headers: {
                             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-                            'Referer': 'https://www.wnacg.com/'
+                            'Referer': referer
                         }
                     });
                     let doc = HTMLParser.parse(text);
                     let img = doc.querySelector('#picarea');
                     let src = img && (img.getAttribute('src') || img.getAttribute('data-src'));
-                    if (!src) throw new Error(`Could not find the full-size image at ${page.link}`);
+                    if (!src) throw new Error(`Could not find the full-size image at ${pageUrl}`);
                     images.push({
-                        url: new URL(src, page.link).toString(),
+                        url: new URL(src, pageUrl).toString(),
                         headers: {
-                            Referer: 'https://www.wnacg.com/',
+                            Referer: referer,
                             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
                         }
                     });
@@ -73,7 +77,8 @@ class WnacgProcessor extends Processor {
     }
 
     async checkNew() {
-        let data = await bookFetch(this.data.link, false, false);
+        let url = await site.normalizeUrl(this.data.link);
+        let data = await bookFetch(url, false, false);
         let item = data.list[data.list.length - 1];
         return {
             title: item.title,

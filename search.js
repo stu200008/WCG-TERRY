@@ -1,11 +1,11 @@
-const SITE_URL = 'https://www.wnacg.com/';
-const SEARCH_URL = 'https://www.wnacg.com/search/index.php?q={0}&m=&syn=yes&f=_all&s=create_time_DESC';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 const rateLimitedFetch = require('./network');
+const site = require('./site');
 
 class SearchController extends Controller {
 
-    load() {
+    async load() {
+        this.siteBase = await site.getBase();
         let hints = [];
         let saved = localStorage['hints'];
         if (saved) {
@@ -23,7 +23,9 @@ class SearchController extends Controller {
     }
 
     makeURL(text) {
-        return SEARCH_URL.replace('{0}', encodeURIComponent(text));
+        let url = new URL('/search/index.php', this.siteBase);
+        url.search = `q=${encodeURIComponent(text)}&m=&syn=yes&f=_all&s=create_time_DESC`;
+        return url.toString();
     }
 
     onSearchClicked() {
@@ -100,6 +102,7 @@ class SearchController extends Controller {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
             }
         });
+        let referer = `${new URL(url).origin}/`;
         let doc = HTMLParser.parse(text);
         let cards = doc.querySelectorAll('.gallary_wrap .gallary_item');
         let items = [];
@@ -116,7 +119,7 @@ class SearchController extends Controller {
                 link: new URL(link, url).toString(),
                 picture: new URL(picture, url).toString(),
                 pictureHeaders: {
-                    Referer: SITE_URL,
+                    Referer: referer,
                     'User-Agent': USER_AGENT
                 },
                 subtitle: info ? info.text.trim() : ''

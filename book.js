@@ -1,4 +1,5 @@
 const bookFetch = require('./book_fetch');
+const site = require('./site');
 
 class BookController extends Controller {
 
@@ -21,7 +22,7 @@ class BookController extends Controller {
     }
 
     async load(data) {
-        this.url = data.link;
+        this.url = await site.normalizeUrl(data.link);
         this.data = {
             title: data.title,
             subtitle: data.subtitle,
