@@ -22,37 +22,36 @@
                             </view>
                         </stack>
                     </attr:background>
-                    <column>
-                        <text lines="6" overflow="ellipsis">
-                            <span size="14">$title</span>
-                            <span alignment="middle">
-                                <button type="text" tapTargetSize="shrinkWrap" minimumSize="zero" padding="ltrb(4,1,4,10)" onPressed="onSourcePressed">
-                                    <text size="6" text="loc(source)"/>
-                                </button>
-                            </span>
-                            <if candidate="isNotNull($subtitle)">
-                                <span><view padding="ltrb(0,5,0,0)"/></span>
-                                <span size="8">$subtitle</span>
-                            </if>
-                            <if candidate="isNotNull($summary)">
-                                <span><view padding="ltrb(0,5,0,0)"/></span>
-                                <span size="8">$summary</span>
-                            </if>
-                        </text>
+                    <text lines="12" overflow="ellipsis">
+                        <span size="14">$title</span>
+                        <span alignment="middle">
+                            <button type="text" tapTargetSize="shrinkWrap" minimumSize="zero" padding="ltrb(4,1,4,10)" onPressed="onSourcePressed">
+                                <text size="6" text="loc(source)"/>
+                            </button>
+                        </span>
+                        <if candidate="isNotNull($subtitle)">
+                            <span><view padding="ltrb(0,5,0,0)"/></span>
+                            <span size="8">$subtitle</span>
+                        </if>
+                        <if candidate="isNotNull($summary)">
+                            <span><view padding="ltrb(0,5,0,0)"/></span>
+                            <span size="8">$summary</span>
+                        </if>
                         <if candidate="isNotNull($tags)">
-                            <row>
-                                <text size="8">標籤：</text>
-                                <for array="$tags">
+                            <span><view padding="ltrb(0,5,0,0)"/></span>
+                            <span size="8">標籤：</span>
+                            <for array="$tags">
+                                <span alignment="middle">
                                     <button type="text" tapTargetSize="shrinkWrap" minimumSize="zero" padding="ltrb(2,1,2,1)">
                                         <attr:onPressed>
                                             <callback function="onTagPressed" args="array($item)"/>
                                         </attr:onPressed>
                                         <text size="8">${item}</text>
                                     </button>
-                                </for>
-                            </row>
+                                </span>
+                            </for>
                         </if>
-                    </column>
+                    </text>
                 </FlexibleSpaceBar>
                 <attr:actions>
                     <if candidate="isNotNull($downloadUrl)">
