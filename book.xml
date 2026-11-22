@@ -122,7 +122,15 @@
                         <list-item>
                             <attr:onTap><callback function="onPressed" args="array($index)"/></attr:onTap>
                             <attr:leading><img src="${item.picture}" headers="${item.pictureHeaders}" width="48" height="48" fit="cover"/></attr:leading>
-                            <attr:title><text>${item.title}  ${item.subtitle}</text></attr:title>
+                            <attr:title>
+                                <text>
+                                    <if candidate="isNotNull(${item.title})">
+                                        <span>${item.title}</span>
+                                        <span>  </span>
+                                    </if>
+                                    <span>${item.subtitle}</span>
+                                </text>
+                            </attr:title>
                             <attr:trailing>
                                 <view width="26" height="26" alignment="center">
                                     <switch>

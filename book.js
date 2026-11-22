@@ -58,13 +58,13 @@ class BookController extends Controller {
             let saved = JSON.parse(cached);
             if (saved.title) this.data.title = saved.title;
             if (saved.summary) this.data.summary = saved.summary;
-            if (saved.version === 6 &&
+            if (saved.version === 7 &&
                 Array.isArray(saved.tags) &&
                 saved.tags.every(tag => typeof tag === 'string')) {
                 this.data.tags = saved.tags.length > 0 ? saved.tags : null;
             }
             if (saved.downloadUrl) this.data.downloadUrl = saved.downloadUrl;
-            let hasChapter = saved.version === 6 &&
+            let hasChapter = saved.version === 7 &&
                 Array.isArray(saved.list) &&
                 saved.list.length > 0 &&
                 saved.list.every(chapter =>

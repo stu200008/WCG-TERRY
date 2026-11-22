@@ -127,7 +127,7 @@ async function fetchChapters(chapters, includeAllPages) {
         };
         result.push({
             title: chapter.title,
-            subtitle: `${imageUrls.length} 頁`,
+            subtitle: `${imageUrls.length}P`,
             link: chapter.link,
             picture: imageUrls[0],
             pictureHeaders: headers,
@@ -174,8 +174,8 @@ module.exports = async function(url, includeDownload, includeAllPages) {
         let imageUrls = await fetchImageUrls(url);
         if (includeAllPages === false) imageUrls = imageUrls.slice(0, 1);
         chapters = [{
-            title: '--',
-            subtitle: `${imageUrls.length} 頁`,
+            title: null,
+            subtitle: `${imageUrls.length}P`,
             link: url,
             picture: pages[0].picture,
             pictureHeaders: pages[0].pictureHeaders,
@@ -183,7 +183,7 @@ module.exports = async function(url, includeDownload, includeAllPages) {
         }];
     }
     let result = {
-        version: 6,
+        version: 7,
         summary: `${chapters.length} 章`,
         list: chapters,
         tags: parseTags(doc),
