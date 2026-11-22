@@ -1,1 +1,5 @@
-# WCG-TERRY
+# WNACG plugin
+
+A Kinoko v3 plugin for WNACG, with update, doujinshi, single-volume, and weekly ranking tabs, search, in-app page reading, and the site's direct ZIP download URI.
+
+On an album page, the download icon opens the official archive URI when WNACG provides one.
