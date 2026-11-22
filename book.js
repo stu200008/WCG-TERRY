@@ -94,6 +94,10 @@ class BookController extends Controller {
         this.reload();
     }
 
+    onBackPressed() {
+        this.navigateBack(null);
+    }
+
     async reload() {
         this.setState(() => {
             this.data.loading = true;

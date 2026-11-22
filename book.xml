@@ -57,6 +57,11 @@
                     </attr:background>
                     <text lines="1"><span size="1" color="hex(#0000)"> </span></text>
                 </FlexibleSpaceBar>
+                <attr:leading>
+                    <button type="icon" onPressed="onBackPressed">
+                        <icon color="hex(#FFFFFF)">arrow_back</icon>
+                    </button>
+                </attr:leading>
                 <attr:actions>
                     <button type="icon" onPressed="onSourcePressed">
                         <icon color="hex(#FFFFFF)">open_in_browser</icon>
